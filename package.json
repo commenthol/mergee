@@ -1,0 +1,44 @@
+{
+  "name": "mergee",
+  "description": "Utilities for objects",
+  "version": "0.1.0",
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "latest",
+    "jshint": "latest",
+    "istanbul": "latest",
+    "jsdoc": "latest"
+  },
+  "scripts": {
+    "test": "mocha test/*.mocha.js",
+    "cover": "istanbul cover _mocha --report lcov --report text -- -R dot --check-leaks test/*.mocha.js",
+    "lint": "jshint --show-non-errors *.js */*.js",
+    "doc": "jsdoc -d doc -c jsdoc.json index.js lib/*.js",
+    "clean": "rm -rf doc coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/commenthol/mergee"
+  },
+  "keywords": [
+    "merge",
+    "extend",
+    "clone",
+    "object"
+  ],
+  "author": "commenthol <commenthol@gmail.com>",
+  "maintainers": "commenthol <commenthol@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/commenthol/mergee/issues"
+  },
+  "homepage": "https://github.com/commenthol/mergee"
+}
