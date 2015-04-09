@@ -299,6 +299,16 @@ describe('#merge', function(){
 		assert.deepEqual(res, exp);
 	});
 
+	it('merging sample', function(){
+		var target  = { t: 1, x: { y: 'z' } },
+			source1 = { t: { s1: /source1/ }, x: null },
+			source2 = { t: { s2: new Date(100) } };
+
+		var res = M.merge(target, source1, source2);
+		var exp = { t: { s1: /source1/, s2: new Date(100) }, x: null };
+		assert.deepEqual(res, exp);
+	});
+
 });
 
 describe('#mergeExt', function(){
@@ -331,6 +341,18 @@ describe('#mergeExt', function(){
 		var r = M.mergeExt(opts, o1, o2);
 		assert.ok(r == o1);
 	});
+
+	it('merging sample', function(){
+		var target  = { t: 1, x: { y: 'z' } },
+			source1 = { t: { s1: /source1/ }, x: null },
+			source2 = { t: { s2: new Date(100) } };
+
+		var res = M.mergeExt({ ignoreNull: true }, target, source1, source2);
+		var exp = { t: { s1: /source1/, s2: new Date(100) }, x: { y: 'z' } };
+		//~ console.log(res)
+		assert.deepEqual(res, exp);
+	});
+
 });
 
 describe('#clone', function(){
@@ -351,6 +373,14 @@ describe('#clone', function(){
 		assert.ok(r[0] !== o[0]);
 		assert.ok(r[0].a !== o[0].a);
 	});
+	it('clone sample', function(){
+		var obj = { a: { b: { c: 1 } } };
+		var cloned = M.clone(obj);
+		assert.ok(cloned !== obj)
+		assert.ok(cloned.a !== obj.a)
+		assert.ok(cloned.a.b !== obj.a.b)
+	});
+
 });
 
 describe('#deepEqual', function(){
@@ -517,6 +547,17 @@ describe('#select', function(){
 		var res = M.select(obj, ["test", "test"] );
 
 		assert.deepEqual(res, 0);
+	});
+	it('try select from undefined property', function(){
+		var obj = {
+			test: {
+				test: 0,
+				test2: { b: 2 }
+			}
+		};
+		var res = M.select(obj, 'there.is.no.such.prop' );
+
+		assert.deepEqual(res, undefined);
 	});
 });
 

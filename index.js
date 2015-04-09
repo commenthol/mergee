@@ -7,11 +7,34 @@
 
 // module variables
 var util = require('./lib/util');
+
 var deepEqual = require('./lib/deepequal');
+/**
+ * deep comparison of `actual` and `expected`
+ *
+ * @see https://github.com/joyent/node/blob/v0.12.0-release/lib/assert.js
+ *
+ * @function deepEqual
+ * @param {Any} actual
+ * @param {Any} expected
+ * @return {Boolean} true if `actual` equals `expected`
+ */
 exports.deepEqual = deepEqual;
 
 /**
  * check if an object `obj` contains circular structures
+ *
+ * #### Example
+ *
+ * ````js
+ * var isCircular  = require('mergee').isCircular,
+ *     obj = { a: {} };
+ * obj.a.c = { c: 1 };
+ * // isCircular(obj) === true
+ * ````
+ *
+ * @param {Object} obj - Object to check
+ * @return {Boolean} true if `obj` contains circularities
  */
 function isCircular (obj) {
 	return _checkCircular({_visited: []}, obj);
@@ -19,7 +42,8 @@ function isCircular (obj) {
 exports.isCircular = isCircular;
 
 /**
- * @private
+ * recursive helper function
+ * @api private
  */
 function _checkCircular(opts, obj) {
 	var key;
@@ -38,9 +62,21 @@ function _checkCircular(opts, obj) {
 }
 
 /**
- * extend object `target` with multiple other objects
- * @param {Object} target
- * @param {Any} arguments 1 ... n
+ * extend object `target` with multiple `source` objects
+ *
+ * #### Example
+ *
+ * ````js
+ * var extend  = require('mergee').extend,
+ *     target  = { a:{A:1}, b:{A:1} },
+ *     source1 = { b:{B:2}, c:{B:2} },
+ *     source2 = { d:{C:3} };
+ * extend(target, source1, source2);
+ * // target === { a:{A:1}, b:{B:2}, c:{B:2}, d:{C:3} };
+ * ````
+ *
+ * @param {Object|Array|Function} target
+ * @param {Any} source - arguments 2 ... n
  * @return {Object} extended target
  */
 function extend (target) {
@@ -62,8 +98,20 @@ exports.extend = extend;
 
 /**
  * merge multiple objects into `target`
- * @param {Object|Function|Array} target
- * @param {Any} arguments 1 ... n
+ *
+ * #### Example
+ *
+ * ````js
+ * var merge = require('mergee').merge,
+ *     target  = { t: 1, x: { y: 'z' } },
+ *     source1 = { t: { s1: /source1/ } },
+ *     source2 = { t: { s2: new Date(100), x: null } };
+ * merge(target, source1, source2);
+ * // target === { t: { s1: /source1/, s2: Wed Dec 31 1969 17:00:00 GMT-0700 (MST) }, x: null }
+ * ````
+ *
+ * @param {Object|Function|Array} target - target object
+ * @param {Any} source - arguments 2 ... n
  * @return {Object} merged target
  */
 function merge () {
@@ -76,8 +124,23 @@ exports.merge = merge;
 /**
  * extended merge
  *
- * ignoreNull: true,		// treat source === null as undefined - target does not get deleted
- * ignoreCircular: true,	// ignore cirular structures - no error gets thrown
+ * #### Example
+ *
+ * ````js
+ * var merge = require('mergee').merge,
+ *     target  = { t: 1, x: { y: 'z' } },
+ *     source1 = { t: { s1: /source1/ } },
+ *     source2 = { t: { s2: new Date(100), x: null } };
+ * mergeExt({ ignoreNull: true }, target, source1, source2);
+ * // target === { t: { s1: /source1/, s2: Wed Dec 31 1969 17:00:00 GMT-0700 (MST) }, x: { y: 'z' } }
+ * ````
+ *
+ * @param {Object} opts - options
+ * @param {Boolean} opts.ignoreNull - treat `source === null` as undefined - target does not get deleted
+ * @param {Boolean} opts.ignoreCircular - ignore cirular structures - no error gets thrown
+ * @param {Object|Function|Array} target - target object
+ * @param {Any} source - arguments 3 ... n
+ * @return {Object} merged target
  */
 function mergeExt (opts, target) {
 	var visited = [];
@@ -95,7 +158,9 @@ function mergeExt (opts, target) {
 exports.mergeExt = mergeExt;
 
 /**
- * @private
+ * recursive merge helper
+ *
+ * @api private
  * @param {Object} opts
  * @param {Any} target
  * @param {Any} source
@@ -227,7 +292,19 @@ exports._merge = _merge;
 
 /**
  * perform a deep clone of `obj`
- * @param {Object|Array} obj
+ *
+ * #### Example
+ *
+ * ```js
+ * var clone = require('mergee').clone,
+ *     obj = { a: { b: { c: 1 } } };
+ * var cloned = clone(obj);
+ * // (cloned !== obj)
+ * // (cloned.a !== obj.a)
+ * // (cloned.a.b !== obj.a.b)
+ * ```
+ *
+ * @param {Object|Array} obj - object to get cloned
  * @return {Object|Array} deep cloned object
  */
 function clone (obj) {
@@ -266,7 +343,20 @@ function _splitKeys (keys, opts) {
 
 /**
  * pick properties from `obj` into a new object
- * @param {Object} obj
+ *
+ * #### Example
+ *
+ * ```js
+ * var r,
+ *     pick = require('mergee').pick,
+ *     obj = { a:1, b:2, c:3, d:4 };
+ * r = pick(o, ['a', 'd']);
+ * // r = { a:1, d: 4 }
+ * r = pick(o, 'a,d');
+ * // r = { a:1, d: 4 }
+ * ```
+ *
+ * @param {Object} obj - object to pick properties from
  * @param {Array|String} keys - Array of properties or comma separated string of properties
  * @return {Object} object with picked properties
  */
@@ -289,7 +379,20 @@ exports.pick = pick;
 
 /**
  * omit properties from `obj` into a new object
- * @param {Object} obj
+ *
+ * #### Example
+ *
+ * ```js
+ * var r,
+ *     omit = require('mergee').omit,
+ *     obj = { a:1, b:2, c:3, d:4 };
+ * r = omit(o, ['a', 'd']);
+ * // r = { b:2, c: 3 }
+ * r = omit(o, 'a,d');
+ * // r = { b:2, c: 3 }
+ * ```
+ *
+ * @param {Object} obj - object
  * @param {Array|String} keys - Array of properties or comma separated string of properties
  * @return {Object} object with omitted properties
  */
@@ -312,7 +415,22 @@ exports.omit = omit;
 
 /**
  * select properties from `obj`
- * @param {Object} obj
+ *
+ * #### Example
+ *
+ * ```js
+ * var r,
+ *     select = require('mergee').select,
+ *     obj = { a: { b: { c: 1 } } };
+ * r = select(obj, [a, b, c]);
+ * // r = 1
+ * r = select(obj, 'a.b.c');
+ * // r = 1
+ * r = select(obj, 'there.is.no.such.property'); // this will not throw!
+ * // r = undefined
+ * ```
+ *
+ * @param {Object} obj - object to select from
  * @param {Array|String} keys - Array of properties or dot separated string of properties
  * @return {Object} selected object
  */
