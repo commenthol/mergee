@@ -21,7 +21,16 @@ This is a selection of utilities for objects and contains:
 
 <!-- !toc (minlevel=2 omit="Table of Contents") -->
 
-* [Description](#description)
+* [Methods](#methods)
+  * [extend(target, source)](#extend-target-source)
+  * [merge(target, source)](#merge-target-source)
+  * [mergeExt(opts, opts.ignoreNull, opts.ignoreCircular, target, source)](#mergeext-opts-opts-ignorenull-opts-ignorecircular-target-source)
+  * [clone(obj)](#clone-obj)
+  * [pick(obj, keys)](#pick-obj-keys)
+  * [omit(obj, keys)](#omit-obj-keys)
+  * [select(obj, keys)](#select-obj-keys)
+  * [isCircular(obj)](#iscircular-obj)
+  * [deepEqual(actual, expected)](#deepequal-actual-expected)
 * [Contribution and License Agreement](#contribution-and-license-agreement)
 * [License](#license)
 
