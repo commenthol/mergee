@@ -22,15 +22,15 @@ This is a selection of utilities for objects and contains:
 <!-- !toc (minlevel=2 omit="Table of Contents") -->
 
 * [Methods](#methods)
-  * [extend(target, source)](#extend-target-source)
-  * [merge(target, source)](#merge-target-source)
-  * [mergeExt(opts, opts.ignoreNull, opts.ignoreCircular, target, source)](#mergeext-opts-opts-ignorenull-opts-ignorecircular-target-source)
-  * [clone(obj)](#clone-obj)
-  * [pick(obj, keys)](#pick-obj-keys)
-  * [omit(obj, keys)](#omit-obj-keys)
-  * [select(obj, keys)](#select-obj-keys)
-  * [isCircular(obj)](#iscircular-obj)
-  * [deepEqual(actual, expected)](#deepequal-actual-expected)
+  * [extend(target, source)](#extendtarget-source)
+  * [merge(target, source)](#mergetarget-source)
+  * [mergeExt(opts, opts.ignoreNull, opts.ignoreCircular, target, source)](#mergeextopts-optsignorenull-optsignorecircular-target-source)
+  * [clone(obj)](#cloneobj)
+  * [pick(obj, keys)](#pickobj-keys)
+  * [omit(obj, keys)](#omitobj-keys)
+  * [select(obj, keys)](#selectobj-keys)
+  * [isCircular(obj)](#iscircularobj)
+  * [deepEqual(actual, expected)](#deepequalactual-expected)
 * [Contribution and License Agreement](#contribution-and-license-agreement)
 * [License](#license)
 
@@ -279,6 +279,7 @@ Copyright (c) 2015 commenthol (MIT License)
 See [LICENSE][] for more info.
 
 [LICENSE]: ./LICENSE
+
 
 
 

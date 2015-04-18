@@ -1,6 +1,10 @@
-all: 0.8 0.10 0.11 0.12
+all: readme v0.8 v0.12
 
-%:
+readme: README.md
+	markedpp --githubid $< > tmp.md
+	mv tmp.md $<
+
+v%:
 	n $@ && npm test
 
-.PHONY: all
+.PHONY: all readme

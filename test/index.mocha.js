@@ -561,7 +561,8 @@ describe('#select', function(){
 	});
 });
 
-
-
-
-
+describe('#util', function(){
+	it('isObject', function(){
+		assert.ok(M.util.isObject({}));
+	});
+});

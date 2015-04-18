@@ -7,6 +7,7 @@
 
 // module variables
 var util = require('./lib/util');
+exports.util = util;
 
 var deepEqual = require('./lib/deepequal');
 /**
