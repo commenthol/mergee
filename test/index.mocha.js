@@ -451,10 +451,22 @@ describe('#pick', function(){
 		var r = M.pick(o, 'a,d');
 		assert.deepEqual(r, e);
 	});
+	it('pick a and d using String with spaces', function(){
+		var o = { a:1, b:2, c:3, d:4 };
+		var e = { a:1, d:4 };
+		var r = M.pick(o, 'a, d ');
+		assert.deepEqual(r, e);
+	});
 	it('pick only d using String', function(){
 		var o = { a:1, b:2, c:3, d:4 };
 		var e = { d:4 };
 		var r = M.pick(o, 'd');
+		assert.deepEqual(r, e);
+	});
+	it('pick a.b and c.d using String', function(){
+		var o = { a: { a:1, b:2 }, c: { c:3, d:4 }, e: 5 };
+		var e = { a: {b:2}, c: {d:4} };
+		var r = M.pick(o, 'a.b, c.d');
 		assert.deepEqual(r, e);
 	});
 	it('pick from empty object', function(){
@@ -492,6 +504,12 @@ describe('#omit', function(){
 		var o = { a:1, b:2, c:3, d:4 };
 		var e = { a:1, b:2, c:3 };
 		var r = M.omit(o, 'd');
+		assert.deepEqual(r, e);
+	});
+	it('omit a.b and c.d using String', function(){
+		var o = { a: { a:1, b:2 }, c: { c:3, d:4 }, e: 5 };
+		var e = { a: { a:1 }, c: { c:3 }, e: 5 };
+		var r = M.omit(o, 'a.b, c.d');
 		assert.deepEqual(r, e);
 	});
 	it('omit from empty object', function(){

@@ -10,6 +10,7 @@ var util = require('./lib/util');
 exports.util = util;
 
 var deepEqual = require('./lib/deepequal');
+
 /**
  * deep comparison of `actual` and `expected`
  *
@@ -319,27 +320,50 @@ exports.clone = clone;
  * @param {Array|String} keys
  * @return {Object} obj for comparison
  */
-function _splitKeys (keys, opts) {
-	var test = {};
-	opts = extend({ char: ','}, opts);
+function _splitPath (keys) {
+	var out;
 
 	if (util.isString(keys)) {
-		if (~keys.indexOf(opts.char)) {
-			keys = keys.split(opts.char);
-		}
-		else {
-			keys = [ keys ];
-		}
+		out = [];
+		keys
+		.split('.')
+		.forEach(function(k){
+			k = k.trim()
+				.replace(/^([^\[]+)\[(["']?)(.+)\2\]$/, function(m, m1, m2, m3) {
+					if (m1 && m3) {
+						out.push(m1, m3)
+					}
+					return '';
+				});
+			if (k) {
+				out.push(k);
+			}
+		});
+		keys = out;
 	}
-	if (opts.array) {
-		return keys;
+	return keys;
+}
+
+/**
+ *
+ */
+function _splitProps (keys) {
+	var test = {};
+
+	if (util.isString(keys)) {
+		keys = keys
+				.split(',')
+				.map(function(k){
+					return k.trim();
+				});
 	}
 	if (util.isArray(keys)) {
 		keys.forEach(function(key){
 			test[key] = 1;
 		});
+		return test;
 	}
-	return test;
+	return {};
 }
 
 /**
@@ -358,19 +382,20 @@ function _splitKeys (keys, opts) {
  * ```
  *
  * @param {Object} obj - object to pick properties from
- * @param {Array|String} keys - Array of properties or comma separated string of properties
+ * @param {Array|String} props - Array of properties or comma separated string of properties
  * @return {Object} object with picked properties
  */
-function pick (obj, keys) {
+function pick (obj, props) {
 	var key,
+		val,
 		out,
-		test = _splitKeys(keys);
+		test = _splitProps(props);
 
 	if (util.isObject(obj)) {
 		out = {};
-		for (key in obj) {
-			if (obj.hasOwnProperty(key) && (key in test)) {
-				out[key] = obj[key];
+		for (key in test) {
+			if ((val = get(obj, key)) != undefined) {
+				set(out, key, val);
 			}
 		}
 	}
@@ -397,16 +422,16 @@ exports.pick = pick;
  * @param {Array|String} keys - Array of properties or comma separated string of properties
  * @return {Object} object with omitted properties
  */
-function omit (obj, keys) {
+function omit (obj, props) {
 	var key,
 		out,
-		test = _splitKeys(keys);
+		test = _splitProps(props);
 
 	if (util.isObject(obj)) {
-		out = {};
-		for (key in obj) {
-			if (obj.hasOwnProperty(key) && !(key in test)) {
-				out[key] = obj[key];
+		out = clone(obj);
+		for (key in test) {
+			if ((get(obj, key))) {
+				set(out, key, null);
 			}
 		}
 	}
@@ -415,7 +440,7 @@ function omit (obj, keys) {
 exports.omit = omit;
 
 /**
- * select properties from `obj`
+ * get properties from `obj`
  *
  * #### Example
  *
@@ -435,15 +460,15 @@ exports.omit = omit;
  * @param {Array|String} keys - Array of properties or dot separated string of properties
  * @return {Object} selected object
  */
-function select(obj, keys) {
+function get(obj, keys, _default) {
 	var i,
 		key,
 		tmp = obj || {};
 
-	keys = _splitKeys(keys, { char: '.', array: true });
+	keys = _splitPath(keys);
 
 	if (!keys || keys.length === 0) {
-		return;
+		return _default;
 	}
 
 	for (i=0; i<keys.length; i++) {
@@ -452,10 +477,46 @@ function select(obj, keys) {
 			tmp = tmp[key];
 		}
 		else {
-			return;
+			return _default;
 		}
 	}
 	return tmp;
 }
-exports.select = select;
+exports.get = get;
+exports.select = get;
 
+/**
+ *
+ */
+function set(obj, keys, value, opts) {
+	var i,
+		key,
+		last,
+		tmp = obj || {};
+
+	opts = opts || {};
+	keys = _splitPath(keys);
+
+	if (!keys || keys.length === 0) {
+		return;
+	}
+
+	last = keys.pop();
+
+	for (i=0; i<keys.length; i++) {
+		key = keys[i];
+		if (!tmp[key]) {
+			tmp[key] = {};
+		}
+		if (tmp.hasOwnProperty(key)) {
+			tmp = tmp[key];
+		}
+	}
+	if (value === null) {
+		delete(tmp[last]);
+	} else {
+		tmp[last] = value;
+	}
+	return obj;
+}
+exports.set = set;
