@@ -11,6 +11,10 @@ exports.util = util;
 
 var deepEqual = require('./lib/deepequal');
 
+var OPEN   = /\[["']|^\s*["']/;
+var CLOSE  = /["']\]|["']\s*$/;
+var QUOTES = /^(["'])(.*)\1$/;
+
 /**
  * deep comparison of `actual` and `expected`
  *
@@ -315,7 +319,39 @@ function clone (obj) {
 exports.clone = clone;
 
 /**
- * split comma separated String or Array into a test hash
+ * segment path or properties string
+ * @api private
+ * @param {String} char - separator char
+ * @return {Function}
+ */
+function _segment (char) {
+	var tmp;
+	char = char || '.';
+	return function(k){
+		if (tmp) {
+			tmp += char + k;
+			if (CLOSE.test(k)) {
+				k = tmp;
+				tmp = '';
+			}
+			else {
+				return;
+			}
+		}
+		else if (OPEN.test(k)) {
+			tmp = k;
+			if (CLOSE.test(k)) {
+				tmp = '';
+			} else {
+				return;
+			}
+		}
+		return k.trim().replace(QUOTES, '$2');
+	};
+}
+
+/**
+ * split dot separated String or Array into a property path
  * @private
  * @param {Array|String} keys
  * @return {Object} obj for comparison
@@ -327,11 +363,12 @@ function _splitPath (keys) {
 		out = [];
 		keys
 		.split('.')
+		.map(_segment('.'))
 		.forEach(function(k){
-			k = k.trim()
+			k = (k||' ').trim()
 				.replace(/^([^\[]+)\[(["']?)(.+)\2\]$/, function(m, m1, m2, m3) {
 					if (m1 && m3) {
-						out.push(m1, m3)
+						out.push(m1, m3);
 					}
 					return '';
 				});
@@ -343,28 +380,34 @@ function _splitPath (keys) {
 	}
 	return keys;
 }
+exports._splitPath = _splitPath;
 
 /**
- *
+ * split comma separated String or Array into a test hash
+ * @private
+ * @param {Array|String} keys
+ * @return {Object} obj for comparison
  */
-function _splitProps (keys) {
+function _splitProps (props) {
 	var test = {};
 
-	if (util.isString(keys)) {
-		keys = keys
+	if (util.isString(props)) {
+		props = props
 				.split(',')
-				.map(function(k){
-					return k.trim();
+				.map(_segment(','))
+				.filter(function(k){
+					return k;
 				});
 	}
-	if (util.isArray(keys)) {
-		keys.forEach(function(key){
+	if (util.isArray(props)) {
+		props.forEach(function(key){
 			test[key] = 1;
 		});
 		return test;
 	}
 	return {};
 }
+exports._splitProps = _splitProps;
 
 /**
  * pick properties from `obj` into a new object
@@ -374,11 +417,11 @@ function _splitProps (keys) {
  * ```js
  * var r,
  *     pick = require('mergee').pick,
- *     obj = { a:1, b:2, c:3, d:4 };
- * r = pick(o, ['a', 'd']);
- * // r = { a:1, d: 4 }
- * r = pick(o, 'a,d');
- * // r = { a:1, d: 4 }
+ *     obj = { a: 1, b: [ 1, 2 ], c: { cc:3, 'c-d':4 }, '0d': { '0d0': 5 } };
+ * r = pick(obj, ['a', 'b[1]', 'c["c-d"]', '0d.0d0']);
+ * //> r = { a: 1, b: { '1': 2 }, c: { 'c-d': 4 }, '0d': { '0d0': 5 } }
+ * r = pick(obj, 'a, b[1], c["c-d"], 0d.0d0');
+ * //> r = { a: 1, b: { '1': 2 }, c: { 'c-d': 4 }, '0d': { '0d0': 5 } }
  * ```
  *
  * @param {Object} obj - object to pick properties from
@@ -394,7 +437,7 @@ function pick (obj, props) {
 	if (util.isObject(obj)) {
 		out = {};
 		for (key in test) {
-			if ((val = get(obj, key)) != undefined) {
+			if ((val = get(obj, key)) != undefined) { // jshint ignore:line
 				set(out, key, val);
 			}
 		}
@@ -411,15 +454,15 @@ exports.pick = pick;
  * ```js
  * var r,
  *     omit = require('mergee').omit,
- *     obj = { a:1, b:2, c:3, d:4 };
- * r = omit(o, ['a', 'd']);
- * // r = { b:2, c: 3 }
- * r = omit(o, 'a,d');
- * // r = { b:2, c: 3 }
+ *     obj = { a: 1, b: [ 1, 2 ], c: { cc:3, 'c-d':4 }, '0d': { '0d0': 5 } };
+ * r = omit(obj, ['a', 'b[1]', 'c["c-d"]', '0d.0d0']);
+ * // r = { b: [ 1,  ], c: { cc: 3 }, '0d': {} }
+ * r = omit(obj, 'a, b[1], c["c-d"], 0d.0d0');
+ * // r = { b: [ 1,  ], c: { cc: 3 }, '0d': {} }
  * ```
  *
  * @param {Object} obj - object
- * @param {Array|String} keys - Array of properties or comma separated string of properties
+ * @param {Array|String} props - Array of properties or comma separated string of properties
  * @return {Object} object with omitted properties
  */
 function omit (obj, props) {
@@ -442,22 +485,23 @@ exports.omit = omit;
 /**
  * get properties from `obj`
  *
+ *
  * #### Example
  *
  * ```js
  * var r,
- *     select = require('mergee').select,
+ *     get = require('mergee').get,
  *     obj = { a: { b: { c: 1 } } };
- * r = select(obj, [a, b, c]);
+ * r = get(obj, ['a', 'b', 'c']);
  * // r = 1
- * r = select(obj, 'a.b.c');
- * // r = 1
- * r = select(obj, 'there.is.no.such.property'); // this will not throw!
+ * r = get(obj, 'a.b');
+ * // r = { c: 1 }
+ * r = get(obj, 'there.is.no.such.property'); // this will not throw!
  * // r = undefined
  * ```
  *
  * @param {Object} obj - object to select from
- * @param {Array|String} keys - Array of properties or dot separated string of properties
+ * @param {Array|String} keys - Array of properties or dot separated string of properties; If using a String avoid using property names containing a `.`
  * @return {Object} selected object
  */
 function get(obj, keys, _default) {
@@ -483,18 +527,39 @@ function get(obj, keys, _default) {
 	return tmp;
 }
 exports.get = get;
+
+/**
+ * select properties from `obj`
+ * same as `get` - maintained for compatibility reasons
+ */
 exports.select = get;
 
 /**
+ * set a property in `obj`
  *
+ * #### Example
+ *
+ * ```js
+ * var r,
+ *     set = require('mergee').set,
+ *     obj = {};
+ * r = set(obj, ['a', 'b'], { c:1 });
+ * //> r = { a: { b: { c: 1 } } }
+ * r = set(obj, 'a.b.d', 2);
+ * //> r = { a: { b: { c:1, d:2 } } }
+ * ```
+ *
+ * @param {Object} obj - object to select from
+ * @param {Array|String} keys - Array of properties or dot separated string of properties; If using a String avoid using property names containing a `.`
+ * @param {Any} value - The value to set
+ * @return {Object} set object
  */
-function set(obj, keys, value, opts) {
+function set(obj, keys, value) {
 	var i,
 		key,
 		last,
 		tmp = obj || {};
 
-	opts = opts || {};
 	keys = _splitPath(keys);
 
 	if (!keys || keys.length === 0) {

@@ -26,9 +26,10 @@ This is a selection of utilities for objects and contains:
   * [merge(target, source)](#mergetarget-source)
   * [mergeExt(opts, opts.ignoreNull, opts.ignoreCircular, target, source)](#mergeextopts-optsignorenull-optsignorecircular-target-source)
   * [clone(obj)](#cloneobj)
-  * [pick(obj, keys)](#pickobj-keys)
-  * [omit(obj, keys)](#omitobj-keys)
-  * [select(obj, keys)](#selectobj-keys)
+  * [pick(obj, props)](#pickobj-props)
+  * [omit(obj, props)](#omitobj-props)
+  * [get(obj, keys)](#getobj-keys)
+  * [set(obj, keys, value)](#setobj-keys-value)
   * [isCircular(obj)](#iscircularobj)
   * [deepEqual(actual, expected)](#deepequalactual-expected)
 * [Contribution and License Agreement](#contribution-and-license-agreement)
@@ -150,7 +151,7 @@ var cloned = clone(obj);
 **Returns**: `Object | Array`, deep cloned object
 
 
-### pick(obj, keys)
+### pick(obj, props)
 
 pick properties from `obj` into a new object
 
@@ -159,23 +160,23 @@ pick properties from `obj` into a new object
 ```js
 var r,
     pick = require('mergee').pick,
-    obj = { a:1, b:2, c:3, d:4 };
-r = pick(o, ['a', 'd']);
-// r = { a:1, d: 4 }
-r = pick(o, 'a,d');
-// r = { a:1, d: 4 }
+    obj = { a: 1, b: [ 1, 2 ], c: { cc:3, 'c-d':4 }, '0d': { '0d0': 5 } };
+r = pick(obj, ['a', 'b[1]', 'c["c-d"]', '0d.0d0']);
+//> r = { a: 1, b: { '1': 2 }, c: { 'c-d': 4 }, '0d': { '0d0': 5 } }
+r = pick(obj, 'a, b[1], c["c-d"], 0d.0d0');
+//> r = { a: 1, b: { '1': 2 }, c: { 'c-d': 4 }, '0d': { '0d0': 5 } }
 ```
 
 **Parameters**
 
 **obj**: `Object`, object to pick properties from
 
-**keys**: `Array | String`, Array of properties or comma separated string of properties
+**props**: `Array | String`, Array of properties or comma separated string of properties
 
 **Returns**: `Object`, object with picked properties
 
 
-### omit(obj, keys)
+### omit(obj, props)
 
 omit properties from `obj` into a new object
 
@@ -184,37 +185,38 @@ omit properties from `obj` into a new object
 ```js
 var r,
     omit = require('mergee').omit,
-    obj = { a:1, b:2, c:3, d:4 };
-r = omit(o, ['a', 'd']);
-// r = { b:2, c: 3 }
-r = omit(o, 'a,d');
-// r = { b:2, c: 3 }
+    obj = { a: 1, b: [ 1, 2 ], c: { cc:3, 'c-d':4 }, '0d': { '0d0': 5 } };
+r = omit(obj, ['a', 'b[1]', 'c["c-d"]', '0d.0d0']);
+// r = { b: [ 1,  ], c: { cc: 3 }, '0d': {} }
+r = omit(obj, 'a, b[1], c["c-d"], 0d.0d0');
+// r = { b: [ 1,  ], c: { cc: 3 }, '0d': {} }
 ```
 
 **Parameters**
 
 **obj**: `Object`, object
 
-**keys**: `Array | String`, Array of properties or comma separated string of properties
+**props**: `Array | String`, Array of properties or comma separated string of properties
 
 **Returns**: `Object`, object with omitted properties
 
 
-### select(obj, keys)
+### get(obj, keys)
 
-select properties from `obj`
+get properties from `obj`
+
 
 #### Example
 
 ```js
 var r,
-    select = require('mergee').select,
+    get = require('mergee').get,
     obj = { a: { b: { c: 1 } } };
-r = select(obj, [a, b, c]);
+r = get(obj, ['a', 'b', 'c']);
 // r = 1
-r = select(obj, 'a.b.c');
-// r = 1
-r = select(obj, 'there.is.no.such.property'); // this will not throw!
+r = get(obj, 'a.b');
+// r = { c: 1 }
+r = get(obj, 'there.is.no.such.property'); // this will not throw!
 // r = undefined
 ```
 
@@ -222,9 +224,36 @@ r = select(obj, 'there.is.no.such.property'); // this will not throw!
 
 **obj**: `Object`, object to select from
 
-**keys**: `Array | String`, Array of properties or dot separated string of properties
+**keys**: `Array | String`, Array of properties or dot separated string of properties; If using a String avoid using property names containing a `.`
 
 **Returns**: `Object`, selected object
+
+
+### set(obj, keys, value)
+
+set a property in `obj`
+
+#### Example
+
+```js
+var r,
+    set = require('mergee').set,
+    obj = {};
+r = set(obj, ['a', 'b'], { c:1 });
+//> r = { a: { b: { c: 1 } } }
+r = set(obj, 'a.b.d', 2);
+//> r = { a: { b: { c:1, d:2 } } }
+```
+
+**Parameters**
+
+**obj**: `Object`, object to select from
+
+**keys**: `Array | String`, Array of properties or dot separated string of properties; If using a String avoid using property names containing a `.`
+
+**value**: `Any`, The value to set
+
+**Returns**: `Object`, set object
 
 
 ### isCircular(obj)

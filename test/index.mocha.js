@@ -9,6 +9,27 @@ function log (arg) {
 	console.log(JSON.stringify(arg).replace(/"/g, ''));
 }
 
+describe('#_splitProps', function(){
+	it('string ',function(){
+		var res = M._splitProps('a, "b,0", c["d.a,e.a,f.a"]');
+		var exp = { a: 1, 'b,0': 1, 'c["d.a,e.a,f.a"]': 1 };
+		assert.deepEqual(res, exp);
+	});
+});
+
+describe('#_splitPath', function(){
+	it('simple string ',function(){
+		var res = M._splitPath('a."b".c["d"]');
+		var exp = [ 'a', 'b', 'c', 'd' ];
+		assert.deepEqual(res, exp);
+	});
+	it('complex string ',function(){
+		var res = M._splitPath('a."b.0".c["d.e.f"]');
+		var exp = [ 'a', 'b.0', 'c', 'd.e.f' ];
+		assert.deepEqual(res, exp);
+	});
+});
+
 describe('#isCircular', function(){
 	it('circular object', function(){
 		var o = { a: { b: {} } };
@@ -376,9 +397,9 @@ describe('#clone', function(){
 	it('clone sample', function(){
 		var obj = { a: { b: { c: 1 } } };
 		var cloned = M.clone(obj);
-		assert.ok(cloned !== obj)
-		assert.ok(cloned.a !== obj.a)
-		assert.ok(cloned.a.b !== obj.a.b)
+		assert.ok(cloned !== obj);
+		assert.ok(cloned.a !== obj.a);
+		assert.ok(cloned.a.b !== obj.a.b);
 	});
 
 });
@@ -530,17 +551,17 @@ describe('#omit', function(){
 	});
 });
 
-describe('#select', function(){
+describe('#get', function(){
 	it('from a null object', function(){
 		var obj = null;
-		var res = M.select(obj, ["test", "test"] );
+		var res = M.get(obj, ["test", "test"] );
 		assert.deepEqual(res, undefined);
 	});
 	it('with empty selectors', function(){
 		var obj = {
 			test: { a:1 }
 		};
-		var res = M.select(obj);
+		var res = M.get(obj);
 		assert.deepEqual(res, undefined);
 	});
 	it('select an existing object', function(){
@@ -552,7 +573,7 @@ describe('#select', function(){
 				test2: { b: 2 }
 			}
 		};
-		var res = M.select(obj, 'test.test' );
+		var res = M.get(obj, 'test.test' );
 		assert.deepEqual(res, {test: { a: 1 }});
 	});
 	it('select a 0 value from an existing object', function(){
@@ -562,7 +583,7 @@ describe('#select', function(){
 				test2: { b: 2 }
 			}
 		};
-		var res = M.select(obj, ["test", "test"] );
+		var res = M.get(obj, ["test", "test"] );
 
 		assert.deepEqual(res, 0);
 	});
@@ -573,9 +594,29 @@ describe('#select', function(){
 				test2: { b: 2 }
 			}
 		};
-		var res = M.select(obj, 'there.is.no.such.prop' );
+		var res = M.get(obj, 'there.is.no.such.prop' );
 
 		assert.deepEqual(res, undefined);
+	});
+});
+
+describe('#set', function(){
+	it('set properties', function(){
+		var res = M.set({}, 'a."b.0".c["d.e.f"]', 1);
+		var exp = {"a":{"b.0":{"c":{"d.e.f":1}}}};
+		assert.deepEqual(res, exp);
+	});
+	it('delete a property', function(){
+		var obj = { a: { b: {c:1} } };
+		var res = M.set(obj, 'a.b', null);
+		var exp = { a: {} };
+		assert.deepEqual(res, exp);
+	});
+	it('append', function(){
+		var obj = { a: { b: {c:1} } };
+		var res = M.set(obj, 'a.b.d', 2);
+		var exp = { a: { b: {c:1, d:2} } };
+		assert.deepEqual(res, exp);
 	});
 });
 
@@ -584,3 +625,4 @@ describe('#util', function(){
 		assert.ok(M.util.isObject({}));
 	});
 });
+
