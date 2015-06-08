@@ -201,7 +201,9 @@ function _merge(opts, target, source) {
 	}
 
 	if (null === source) {
-		if (!opts.ignoreNull) target = source;
+		if (!opts.ignoreNull || target === undefined) {
+			target = source;
+		}
 		return target;
 	}
 
