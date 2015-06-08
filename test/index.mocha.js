@@ -354,6 +354,14 @@ describe('#mergeExt', function(){
 		assert.deepEqual(res, exp);
 	});
 
+	it('merging null objects with undefined target',function(){
+		var s1 = { b: { c: { d: 1 } } };
+		var s2 = { b: { e: { f: null } } };
+		var exp = { b: { c: { d: 1 }, e: { f: null } } };
+		var res = M.mergeExt ({ignoreNull: true} , s1, s2);
+		assert.deepEqual(res, exp);
+	});
+
 	it('dont merge circular objects', function(){
 		var o1 = { a: {} };
 		o1.a.c = o1.a;
