@@ -101,6 +101,7 @@ function extend (target) {
 	return target;
 }
 exports.extend = extend;
+exports.assign = extend;
 
 /**
  * merge multiple objects into `target`

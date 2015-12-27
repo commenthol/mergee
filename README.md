@@ -7,7 +7,8 @@
 
 This is a selection of utilities for objects and contains:
 
-* extend - extends a target object with multiple sources
+* assign - assigns multiple sources to a target object
+* extend - (same as assign) extends a target object with multiple sources
 * merge - merge multiple sources into a target object
 * mergeExt - same as merge but with options
 * clone - deep clone of an object or array.
@@ -22,6 +23,7 @@ This is a selection of utilities for objects and contains:
 <!-- !toc (minlevel=2 omit="Table of Contents") -->
 
 * [Methods](#methods)
+  * [assign(target, source)](#assigntarget-source)
   * [extend(target, source)](#extendtarget-source)
   * [merge(target, source)](#mergetarget-source)
   * [mergeExt(opts, opts.ignoreNull, opts.ignoreCircular, target, source)](#mergeextopts-optsignorenull-optsignorecircular-target-source)
@@ -39,8 +41,43 @@ This is a selection of utilities for objects and contains:
 
 ## Methods
 
+### assign(target, source)
+
+assign multiple `source` objects to object `target`
+
+#### Example
+
+````js
+var assign  = require('mergee').assign,
+    target  = { a:{A:1}, b:{A:1} },
+    source1 = { b:{B:2}, c:{B:2} },
+    source2 = { d:{C:3} };
+assign(target, source1, source2);
+// target === { a:{A:1}, b:{B:2}, c:{B:2}, d:{C:3} };
+````
+
+**Parameters**
+
+**target**: `Object | Array | function`, assign multiple `source` objects to object `target`
+
+#### Example
+
+````js
+var assign  = require('mergee').assign,
+    target  = { a:{A:1}, b:{A:1} },
+    source1 = { b:{B:2}, c:{B:2} },
+    source2 = { d:{C:3} };
+assign(target, source1, source2);
+// target === { a:{A:1}, b:{B:2}, c:{B:2}, d:{C:3} };
+````
+
+**source**: `Any`, arguments 2 ... n
+
+**Returns**: `Object`, assigned target
 
 ### extend(target, source)
+
+Same as `assign`.
 
 extend object `target` with multiple `source` objects
 
@@ -308,9 +345,3 @@ Copyright (c) 2015 commenthol (MIT License)
 See [LICENSE][] for more info.
 
 [LICENSE]: ./LICENSE
-
-
-
-
-
-
