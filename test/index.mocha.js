@@ -156,7 +156,16 @@ describe('#extend', function(){
 			b: [ {g: 6} ]
 		});
 	});
-
+	it('assigning arrays of objects',function(){
+		var s1 = { a: [ {a: 1} , {b: 2}, 3 ] };
+		var s2 = { b: [ 3, {e: 4}, {f: 5} ] };
+		var s3 = { b: [ {g: 6} ] };
+		var res = M.assign (s1, s2, s3);
+		assert.deepEqual(res, {
+			a: [ {a: 1} , {b: 2}, 3 ],
+			b: [ {g: 6} ]
+		});
+	});
 });
 
 describe('#merge', function(){
