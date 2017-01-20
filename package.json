@@ -12,12 +12,12 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "mocha": "~2.2.5"
+    "mocha": "~3.2.0"
   },
   "scripts": {
     "test": "mocha test/*.mocha.js",
     "cover": "istanbul cover _mocha --report lcov --report text -- -R dot --check-leaks test/*.mocha.js",
-    "lint": "jshint --show-non-errors *.js */*.js",
+    "lint": "eslint '*.js' '**/*.js'",
     "doc": "mkdir -p doc && jsdox -o doc index.js",
     "clean": "rm -rf doc coverage"
   },
@@ -37,5 +37,12 @@
   "bugs": {
     "url": "https://github.com/commenthol/mergee/issues"
   },
-  "homepage": "https://github.com/commenthol/mergee"
+  "homepage": "https://github.com/commenthol/mergee",
+  "eslintConfig": {
+    "extends": "standard",
+    "plugins": [
+      "standard"
+    ],
+    "rules": {}
+  }
 }
