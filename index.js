@@ -3,17 +3,17 @@
  * @license MIT
  */
 
-'use strict';
+'use strict'
 
 // module variables
-var util = require('./lib/util');
-exports.util = util;
+var util = require('./lib/util')
+exports.util = util
 
-var deepEqual = require('./lib/deepequal');
+var deepEqual = require('./lib/deepequal')
 
-var OPEN   = /\[["']|^\s*["']/;
-var CLOSE  = /["']\]|["']\s*$/;
-var QUOTES = /^(["'])(.*)\1$/;
+var OPEN = /\[["']|^\s*["']/
+var CLOSE = /["']\]|["']\s*$/
+var QUOTES = /^(["'])(.*)\1$/
 
 /**
  * deep comparison of `actual` and `expected`
@@ -25,7 +25,7 @@ var QUOTES = /^(["'])(.*)\1$/;
  * @param {Any} expected
  * @return {Boolean} true if `actual` equals `expected`
  */
-exports.deepEqual = deepEqual;
+exports.deepEqual = deepEqual
 
 /**
  * check if an object `obj` contains circular structures
@@ -43,28 +43,28 @@ exports.deepEqual = deepEqual;
  * @return {Boolean} true if `obj` contains circularities
  */
 function isCircular (obj) {
-	return _checkCircular({_visited: []}, obj);
+  return _checkCircular({_visited: []}, obj)
 }
-exports.isCircular = isCircular;
+exports.isCircular = isCircular
 
 /**
  * recursive helper function
  * @api private
  */
-function _checkCircular(opts, obj) {
-	var key;
-	if (util.isObject(obj)) {
-		if (~opts._visited.indexOf(obj)) {
-			return true;
-		}
-		opts._visited.push(obj);
-		for (key in obj) {
-			if (obj.hasOwnProperty(key) && _checkCircular(opts, obj[key])) {
-				return true;
-			}
-		}
-	}
-	return false;
+function _checkCircular (opts, obj) {
+  var key
+  if (util.isObject(obj)) {
+    if (~opts._visited.indexOf(obj)) {
+      return true
+    }
+    opts._visited.push(obj)
+    for (key in obj) {
+      if (obj.hasOwnProperty(key) && _checkCircular(opts, obj[key])) {
+        return true
+      }
+    }
+  }
+  return false
 }
 
 /**
@@ -86,22 +86,22 @@ function _checkCircular(opts, obj) {
  * @return {Object} extended target
  */
 function extend (target) {
-	var i, source, key;
+  var i, source, key
 
-	for (i = 1; i < arguments.length; i++) {
-		source = arguments[i];
-		if (typeof source === 'object' && source) {
-			for (key in source) {
-				if (source.hasOwnProperty(key)) {
-					target[key] = source[key];
-				}
-			}
-		}
-	}
-	return target;
+  for (i = 1; i < arguments.length; i++) {
+    source = arguments[i]
+    if (typeof source === 'object' && source) {
+      for (key in source) {
+        if (source.hasOwnProperty(key)) {
+          target[key] = source[key]
+        }
+      }
+    }
+  }
+  return target
 }
-exports.extend = extend;
-exports.assign = extend;
+exports.extend = extend
+exports.assign = extend
 
 /**
  * merge multiple objects into `target`
@@ -122,11 +122,11 @@ exports.assign = extend;
  * @return {Object} merged target
  */
 function merge () {
-	var args = [].slice.call(arguments);
-	args.unshift({});
-	return mergeExt.apply(null, args);
+  var args = [].slice.call(arguments)
+  args.unshift({})
+  return mergeExt.apply(null, args)
 }
-exports.merge = merge;
+exports.merge = merge
 
 /**
  * extended merge
@@ -150,19 +150,19 @@ exports.merge = merge;
  * @return {Object} merged target
  */
 function mergeExt (opts, target) {
-	var visited = [];
+  var visited = []
 
-	opts = opts || {};
-	opts._visited = visited;
-	opts._count = 0;
+  opts = opts || {}
+  opts._visited = visited
+  opts._count = 0
 
-	for (var i = 2; i < arguments.length; i++) {
-		target = _merge(opts, target, arguments[i]);
-	}
+  for (var i = 2; i < arguments.length; i++) {
+    target = _merge(opts, target, arguments[i])
+  }
 
-	return target;
+  return target
 }
-exports.mergeExt = mergeExt;
+exports.mergeExt = mergeExt
 
 /**
  * recursive merge helper
@@ -173,131 +173,123 @@ exports.mergeExt = mergeExt;
  * @param {Any} source
  * @return {Any} source merged into target
  */
-function _merge(opts, target, source) {
-	var i,
-		j,
-		tmp,
-		test,
-		equal,
-		key,
-		s = { // hold booleans for source
-			isObj: util.isObject(source),
-			isFn:  util.isFunction(source),
-			isArr: util.isArray(source),
-		},
-		t = { // hold booleans for target
-			isObj: util.isObject(target),
-			isFn:  util.isFunction(target),
-			isArr: util.isArray(target),
-		};
+function _merge (opts, target, source) {
+  var i
+  var j
+  var tmp
+  var test
+  var equal
+  var key
+  var s = { // hold booleans for source
+    isObj: util.isObject(source),
+    isFn: util.isFunction(source),
+    isArr: util.isArray(source)
+  }
+  var t = { // hold booleans for target
+    isObj: util.isObject(target),
+    isFn: util.isFunction(target),
+    isArr: util.isArray(target)
+  }
 
-	if (!opts._visited) {
-		opts._visited = [];
-	}
+  if (!opts._visited) {
+    opts._visited = []
+  }
 
-	if (target === source || 	// for primitives or null
-		undefined === source	// target stays the same
-	){
-		return target;
-	}
+  if (target === source ||  // for primitives or null
+    undefined === source    // target stays the same
+  ) {
+    return target
+  }
 
-	if (null === source) {
-		if (!opts.ignoreNull || target === undefined) {
-			target = source;
-		}
-		return target;
-	}
+  if (source === null) {
+    if (!opts.ignoreNull || target === undefined) {
+      target = source
+    }
+    return target
+  }
 
-	if (null === target || undefined === target) {
-		if (s.isObj && s.isArr){
-			// clone into array
-			target = _merge(opts, [], source);
-		}
-		else if (s.isObj) {
-			// clone source
-			target = _merge(opts, {}, source);
-		}
-		else {
-			// copy primitives
-			target = source;
-		}
-		return target;
-	}
+  if (target === null || undefined === target) {
+    if (s.isObj && s.isArr) {
+      // clone into array
+      target = _merge(opts, [], source)
+    } else if (s.isObj) {
+      // clone source
+      target = _merge(opts, {}, source)
+    } else {
+      // copy primitives
+      target = source
+    }
+    return target
+  }
 
-	// create new instances for "special" objects
-	if (s.isObj) {
-		if (util.isRegExp(source)){
-			// create new RegExp
-			target = new RegExp(source);
-			return target;
-		}
-		else if (util.isDate(source)){
-			// create new Date
-			target = new Date(source);
-			return target;
-		}
-		else if (util.isBuffer(source)){
-			// create new Buffer
-			target = new Buffer(source);
-			return target;
-		}
-	}
+  // create new instances for "special" objects
+  if (s.isObj) {
+    if (util.isRegExp(source)) {
+      // create new RegExp
+      target = new RegExp(source)
+      return target
+    } else if (util.isDate(source)) {
+      // create new Date
+      target = new Date(source)
+      return target
+    } else if (util.isBuffer(source)) {
+      // create new Buffer
+      target = new Buffer(source)
+      return target
+    }
+  }
 
-	if (s.isFn) { // replace with source function
-		target = source;
-		// TODO - clone possible keys
-		return target;
-	}
+  if (s.isFn) { // replace with source function
+    target = source
+    // TODO - clone possible keys
+    return target
+  }
 
-	if (s.isArr) {
-		if (t.isArr) {
-			test = [].concat(target); // test for duplicates
-			for (i = 0; i < source.length; i++) {
-				tmp = source[i];
-				if (! ~test.indexOf(tmp)) {
-					if (!util.isObject(tmp) || null === tmp) { // primitive or function or null or undefined
-						target.push(tmp);
-					}
-					else {
-						equal = false;
-						j = test.length;
-						while (j-->0 && !(equal = deepEqual(test[j], tmp)));
-						if (!equal) target.push( _merge(opts, null, tmp) );
-					}
-				}
-			}
-		}
-		else {
-			// if target is not array replace with source
-			target = _merge(opts, [], source);
-		}
-		return target;
-	}
+  if (s.isArr) {
+    if (t.isArr) {
+      test = [].concat(target) // test for duplicates
+      for (i = 0; i < source.length; i++) {
+        tmp = source[i]
+        if (!~test.indexOf(tmp)) {
+          if (!util.isObject(tmp) || tmp === null) { // primitive or function or null or undefined
+            target.push(tmp)
+          } else {
+            equal = false
+            j = test.length
+            while (j-- > 0 && !(equal = deepEqual(test[j], tmp)));
+            if (!equal) target.push(_merge(opts, null, tmp))
+          }
+        }
+      }
+    } else {
+      // if target is not array replace with source
+      target = _merge(opts, [], source)
+    }
+    return target
+  }
 
-	if (!t.isFn && !t.isObj && !t.isArr){
-		// copy primitives
-		target = source;
-		return target;
-	}
+  if (!t.isFn && !t.isObj && !t.isArr) {
+    // copy primitives
+    target = source
+    return target
+  }
 
-	// copy properties if not circular
-	if ( ! ~opts._visited.indexOf(source) ){
-		opts._visited.push(source);
-		for (key in source) {
-			if( source.hasOwnProperty(key) ) {
+  // copy properties if not circular
+  if (!~opts._visited.indexOf(source)) {
+    opts._visited.push(source)
+    for (key in source) {
+      if (source.hasOwnProperty(key)) {
+        target[key] = _merge(opts, target[key], source[key])
+      }
+    }
+    opts._visited.pop()
+  } else if (!opts.ignoreCircular) {
+    throw new Error('can not merge circular structures.')
+  }
 
-				target[key] = _merge(opts, target[key], source[key]);
-			}
-		}
-		opts._visited.pop();
-	}
-	else if (!opts.ignoreCircular) {
-		throw new Error('can not merge circular structures.');
-	}
-
-	return target;
+  return target
 }
-exports._merge = _merge;
+exports._merge = _merge
 
 /**
  * perform a deep clone of `obj`
@@ -317,9 +309,9 @@ exports._merge = _merge;
  * @return {Object|Array} deep cloned object
  */
 function clone (obj) {
-	return _merge({}, (util.isArray(obj) ? [] : {}), obj);
+  return _merge({}, (util.isArray(obj) ? [] : {}), obj)
 }
-exports.clone = clone;
+exports.clone = clone
 
 /**
  * segment path or properties string
@@ -328,29 +320,27 @@ exports.clone = clone;
  * @return {Function}
  */
 function _segment (char) {
-	var tmp;
-	char = char || '.';
-	return function(k){
-		if (tmp) {
-			tmp += char + k;
-			if (CLOSE.test(k)) {
-				k = tmp;
-				tmp = '';
-			}
-			else {
-				return;
-			}
-		}
-		else if (OPEN.test(k)) {
-			tmp = k;
-			if (CLOSE.test(k)) {
-				tmp = '';
-			} else {
-				return;
-			}
-		}
-		return k.trim().replace(QUOTES, '$2');
-	};
+  var tmp
+  char = char || '.'
+  return function (k) {
+    if (tmp) {
+      tmp += char + k
+      if (CLOSE.test(k)) {
+        k = tmp
+        tmp = ''
+      } else {
+        return
+      }
+    } else if (OPEN.test(k)) {
+      tmp = k
+      if (CLOSE.test(k)) {
+        tmp = ''
+      } else {
+        return
+      }
+    }
+    return k.trim().replace(QUOTES, '$2')
+  }
 }
 
 /**
@@ -360,30 +350,30 @@ function _segment (char) {
  * @return {Object} obj for comparison
  */
 function _splitPath (keys) {
-	var out;
+  var out
 
-	if (util.isString(keys)) {
-		out = [];
-		keys
-		.split('.')
-		.map(_segment('.'))
-		.forEach(function(k){
-			k = (k||' ').trim()
-				.replace(/^([^\[]+)\[(["']?)(.+)\2\]$/, function(m, m1, m2, m3) {
-					if (m1 && m3) {
-						out.push(m1, m3);
-					}
-					return '';
-				});
-			if (k) {
-				out.push(k);
-			}
-		});
-		keys = out;
-	}
-	return keys;
+  if (util.isString(keys)) {
+    out = []
+    keys
+    .split('.')
+    .map(_segment('.'))
+    .forEach(function (k) {
+      k = (k || ' ').trim()
+        .replace(/^([^[]+)\[(["']?)(.+)\2\]$/, function (m, m1, m2, m3) {
+          if (m1 && m3) {
+            out.push(m1, m3)
+          }
+          return ''
+        })
+      if (k) {
+        out.push(k)
+      }
+    })
+    keys = out
+  }
+  return keys
 }
-exports._splitPath = _splitPath;
+exports._splitPath = _splitPath
 
 /**
  * split comma separated String or Array into a test hash
@@ -392,25 +382,25 @@ exports._splitPath = _splitPath;
  * @return {Object} obj for comparison
  */
 function _splitProps (props) {
-	var test = {};
+  var test = {}
 
-	if (util.isString(props)) {
-		props = props
-				.split(',')
-				.map(_segment(','))
-				.filter(function(k){
-					return k;
-				});
-	}
-	if (util.isArray(props)) {
-		props.forEach(function(key){
-			test[key] = 1;
-		});
-		return test;
-	}
-	return {};
+  if (util.isString(props)) {
+    props = props
+        .split(',')
+        .map(_segment(','))
+        .filter(function (k) {
+          return k
+        })
+  }
+  if (util.isArray(props)) {
+    props.forEach(function (key) {
+      test[key] = 1
+    })
+    return test
+  }
+  return {}
 }
-exports._splitProps = _splitProps;
+exports._splitProps = _splitProps
 
 /**
  * pick properties from `obj` into a new object
@@ -432,22 +422,23 @@ exports._splitProps = _splitProps;
  * @return {Object} object with picked properties
  */
 function pick (obj, props) {
-	var key,
-		val,
-		out,
-		test = _splitProps(props);
+  var key
+  var val
+  var out
+  var test = _splitProps(props)
 
-	if (util.isObject(obj)) {
-		out = {};
-		for (key in test) {
-			if ((val = get(obj, key)) != undefined) { // jshint ignore:line
-				set(out, key, val);
-			}
-		}
-	}
-	return out;
+  if (util.isObject(obj)) {
+    out = {}
+    for (key in test) {
+      val = get(obj, key)
+      if (val !== undefined && val !== null) {
+        set(out, key, val)
+      }
+    }
+  }
+  return out
 }
-exports.pick = pick;
+exports.pick = pick
 
 /**
  * omit properties from `obj` into a new object
@@ -469,21 +460,21 @@ exports.pick = pick;
  * @return {Object} object with omitted properties
  */
 function omit (obj, props) {
-	var key,
-		out,
-		test = _splitProps(props);
+  var key
+  var out
+  var test = _splitProps(props)
 
-	if (util.isObject(obj)) {
-		out = clone(obj);
-		for (key in test) {
-			if ((get(obj, key))) {
-				set(out, key, null);
-			}
-		}
-	}
-	return out;
+  if (util.isObject(obj)) {
+    out = clone(obj)
+    for (key in test) {
+      if ((get(obj, key))) {
+        set(out, key, null)
+      }
+    }
+  }
+  return out
 }
-exports.omit = omit;
+exports.omit = omit
 
 /**
  * get properties from `obj`
@@ -507,35 +498,34 @@ exports.omit = omit;
  * @param {Array|String} keys - Array of properties or dot separated string of properties; If using a String avoid using property names containing a `.`
  * @return {Object} selected object
  */
-function get(obj, keys, _default) {
-	var i,
-		key,
-		tmp = obj || {};
+function get (obj, keys, _default) {
+  var i
+  var key
+  var tmp = obj || {}
 
-	keys = _splitPath(keys);
+  keys = _splitPath(keys)
 
-	if (!keys || keys.length === 0) {
-		return _default;
-	}
+  if (!keys || keys.length === 0) {
+    return _default
+  }
 
-	for (i=0; i<keys.length; i++) {
-		key = keys[i];
-		if (tmp && tmp.hasOwnProperty(key)) {
-			tmp = tmp[key];
-		}
-		else {
-			return _default;
-		}
-	}
-	return tmp;
+  for (i = 0; i < keys.length; i++) {
+    key = keys[i]
+    if (tmp && tmp.hasOwnProperty(key)) {
+      tmp = tmp[key]
+    } else {
+      return _default
+    }
+  }
+  return tmp
 }
-exports.get = get;
+exports.get = get
 
 /**
  * select properties from `obj`
  * same as `get` - maintained for compatibility reasons
  */
-exports.select = get;
+exports.select = get
 
 /**
  * set a property in `obj`
@@ -557,34 +547,34 @@ exports.select = get;
  * @param {Any} value - The value to set
  * @return {Object} set object
  */
-function set(obj, keys, value) {
-	var i,
-		key,
-		last,
-		tmp = obj || {};
+function set (obj, keys, value) {
+  var i
+  var key
+  var last
+  var tmp = obj || {}
 
-	keys = _splitPath(keys);
+  keys = _splitPath(keys)
 
-	if (!keys || keys.length === 0) {
-		return;
-	}
+  if (!keys || keys.length === 0) {
+    return
+  }
 
-	last = keys.pop();
+  last = keys.pop()
 
-	for (i=0; i<keys.length; i++) {
-		key = keys[i];
-		if (!tmp[key]) {
-			tmp[key] = {};
-		}
-		if (tmp.hasOwnProperty(key)) {
-			tmp = tmp[key];
-		}
-	}
-	if (value === null) {
-		delete(tmp[last]);
-	} else {
-		tmp[last] = value;
-	}
-	return obj;
+  for (i = 0; i < keys.length; i++) {
+    key = keys[i]
+    if (!tmp[key]) {
+      tmp[key] = {}
+    }
+    if (tmp.hasOwnProperty(key)) {
+      tmp = tmp[key]
+    }
+  }
+  if (value === null) {
+    delete (tmp[last])
+  } else {
+    tmp[last] = value
+  }
+  return obj
 }
-exports.set = set;
+exports.set = set

@@ -1,4 +1,4 @@
-all: readme v0.12 v4.2 v5.2
+all: readme v0.12 v4. v6. v7.
 
 readme: README.md
 	markedpp --githubid -i $< -o $<
