@@ -195,8 +195,8 @@ function _merge (opts, target, source) {
     opts._visited = []
   }
 
-  if (target === source ||  // for primitives or null
-    undefined === source    // target stays the same
+  if (target === source || // for primitives or null
+    undefined === source // target stays the same
   ) {
     return target
   }
@@ -278,7 +278,7 @@ function _merge (opts, target, source) {
   if (!~opts._visited.indexOf(source)) {
     opts._visited.push(source)
     for (key in source) {
-      if (source.hasOwnProperty(key)) {
+      if (source.hasOwnProperty(key) && key !== '__proto__') {
         target[key] = _merge(opts, target[key], source[key])
       }
     }
@@ -355,20 +355,20 @@ function _splitPath (keys) {
   if (util.isString(keys)) {
     out = []
     keys
-    .split('.')
-    .map(_segment('.'))
-    .forEach(function (k) {
-      k = (k || ' ').trim()
-        .replace(/^([^[]+)\[(["']?)(.+)\2\]$/, function (m, m1, m2, m3) {
-          if (m1 && m3) {
-            out.push(m1, m3)
-          }
-          return ''
-        })
-      if (k) {
-        out.push(k)
-      }
-    })
+      .split('.')
+      .map(_segment('.'))
+      .forEach(function (k) {
+        k = (k || ' ').trim()
+          .replace(/^([^[]+)\[(["']?)(.+)\2\]$/, function (m, m1, m2, m3) {
+            if (m1 && m3) {
+              out.push(m1, m3)
+            }
+            return ''
+          })
+        if (k) {
+          out.push(k)
+        }
+      })
     keys = out
   }
   return keys
@@ -386,11 +386,11 @@ function _splitProps (props) {
 
   if (util.isString(props)) {
     props = props
-        .split(',')
-        .map(_segment(','))
-        .filter(function (k) {
-          return k
-        })
+      .split(',')
+      .map(_segment(','))
+      .filter(function (k) {
+        return k
+      })
   }
   if (util.isArray(props)) {
     props.forEach(function (key) {

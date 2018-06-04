@@ -334,12 +334,19 @@ describe('#merge', function () {
     var exp = { t: { s1: /source1/, s2: new Date(100) }, x: null }
     assert.deepEqual(res, exp)
   })
+
+  it('should be save against prototype pollution', function () {
+    var payload = '{"__proto__":{"oops":"It works !"}}'
+    var a = {}
+    M.merge({}, JSON.parse(payload))
+    assert.strictEqual(a.oops, undefined)
+  })
 })
 
 describe('#mergeExt', function () {
   var opts = {
-    ignoreNull: true,  // treat source === null as undefined - target does not get deleted
-    ignoreCircular: true  // ignore cirular structures - no error gets thrown
+    ignoreNull: true, // treat source === null as undefined - target does not get deleted
+    ignoreCircular: true // ignore cirular structures - no error gets thrown
   }
 
   it('merge null', function () {
