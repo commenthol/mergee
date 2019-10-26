@@ -43,7 +43,7 @@ exports.deepEqual = deepEqual
  * @return {Boolean} true if `obj` contains circularities
  */
 function isCircular (obj) {
-  return _checkCircular({_visited: []}, obj)
+  return _checkCircular({ _visited: [] }, obj)
 }
 exports.isCircular = isCircular
 
@@ -234,7 +234,7 @@ function _merge (opts, target, source) {
       return target
     } else if (util.isBuffer(source)) {
       // create new Buffer
-      target = new Buffer(source)
+      target = Buffer.from(source)
       return target
     }
   }

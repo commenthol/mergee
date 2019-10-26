@@ -12,6 +12,10 @@
   "bugs": {
     "url": "https://github.com/commenthol/mergee/issues"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/commenthol/mergee"
+  },
   "license": "MIT",
   "author": "commenthol <commenthol@gmail.com>",
   "main": "index.js",
@@ -19,15 +23,13 @@
     "doc": "doc",
     "test": "test"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/commenthol/mergee"
-  },
   "scripts": {
+    "all": "npm run lint && npm t",
     "clean": "rm -rf doc coverage",
     "cover": "istanbul cover _mocha --report lcov --report text -- -R dot --check-leaks test/*.mocha.js",
     "doc": "mkdir -p doc && jsdox -o doc index.js",
     "lint": "eslint '*.js' '**/*.js'",
+    "prepublishOnly": "npm run all",
     "test": "mocha test/*.mocha.js"
   },
   "eslintConfig": {
@@ -39,7 +41,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "mocha": "~5.2.0"
+    "mocha": "~6.2.2"
   },
   "engines": {
     "node": ">=0.8.0"
