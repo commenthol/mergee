@@ -1,11 +1,14 @@
 'use strict'
 
 /* global describe, it */
+/* eslint-disable no-proto */
 
 var assert = require('assert')
 var M = require('../index')
 
-function log (arg) { // eslint-disable-line
+// eslint-disable-next-line no-unused-vars
+function log (arg) {
+  // eslint-disable-line
   console.log(JSON.stringify(arg).replace(/"/g, ''))
 }
 
@@ -20,12 +23,12 @@ describe('#_splitProps', function () {
 describe('#_splitPath', function () {
   it('simple string ', function () {
     var res = M._splitPath('a."b".c["d"]')
-    var exp = [ 'a', 'b', 'c', 'd' ]
+    var exp = ['a', 'b', 'c', 'd']
     assert.deepStrictEqual(res, exp)
   })
   it('complex string ', function () {
     var res = M._splitPath('a."b.0".c["d.e.f"]')
-    var exp = [ 'a', 'b.0', 'c', 'd.e.f' ]
+    var exp = ['a', 'b.0', 'c', 'd.e.f']
     assert.deepStrictEqual(res, exp)
   })
 })
@@ -63,7 +66,9 @@ describe('#extend', function () {
     assert.deepStrictEqual(r, e)
   })
   it('function', function () {
-    var f = function () { return 1 }
+    var f = function () {
+      return 1
+    }
     var r = M.extend(f)
     var e = f
     assert.deepStrictEqual(r, e)
@@ -74,7 +79,11 @@ describe('#extend', function () {
     assert.deepStrictEqual(r, e)
   })
   it('object with two objects of objects', function () {
-    var r = M.extend({ a: { A: 1 }, b: { A: 1 } }, { b: { B: 2 }, c: { B: 2 } }, { d: { C: 3 } })
+    var r = M.extend(
+      { a: { A: 1 }, b: { A: 1 } },
+      { b: { B: 2 }, c: { B: 2 } },
+      { d: { C: 3 } }
+    )
     var e = { a: { A: 1 }, b: { B: 2 }, c: { B: 2 }, d: { C: 3 } }
     assert.deepStrictEqual(r, e)
   })
@@ -84,20 +93,25 @@ describe('#extend', function () {
     assert.deepStrictEqual(r, e)
   })
   it('object with arrays', function () {
-    var r = M.extend({ a: 1 }, [ 1, 2, 3 ], [4, 5])
-    var e = { '0': 4, '1': 5, '2': 3, a: 1 }
+    var r = M.extend({ a: 1 }, [1, 2, 3], [4, 5])
+    var e = { 0: 4, 1: 5, 2: 3, a: 1 }
     assert.deepStrictEqual(r, e)
   })
   it('object with objects of array', function () {
-    var r = M.extend({ a: 1 }, { b: [ 1, 2, 3 ] }, { b: [4, 5] })
+    var r = M.extend({ a: 1 }, { b: [1, 2, 3] }, { b: [4, 5] })
     var e = { a: 1, b: [4, 5] }
     assert.deepStrictEqual(r, e)
   })
   it('function with objects', function () {
-    var f = function () { return 1 }
+    var f = function () {
+      return 1
+    }
     var r = M.extend(f, { a: 1 }, { b: 2 })
-    var e = function () { return 1 }
-    e.a = 1; e.b = 2
+    var e = function () {
+      return 1
+    }
+    e.a = 1
+    e.b = 2
     assert.strictEqual(r.toString(), e.toString())
     Object.keys(e).forEach(function (i) {
       assert.strictEqual(r[i], e[i])
@@ -105,8 +119,9 @@ describe('#extend', function () {
   })
   it('array with objects', function () {
     var r = M.extend([1, 2], { a: 1 }, { b: 2 })
-    var e = [ 1, 2 ]
-    e.a = 1; e.b = 2
+    var e = [1, 2]
+    e.a = 1
+    e.b = 2
     assert.deepStrictEqual(r, e)
   })
   it('extending values', function () {
@@ -137,33 +152,33 @@ describe('#extend', function () {
     })
   })
   it('extending arrays', function () {
-    var s1 = { a: [ 1, 2, 3 ] }
-    var s2 = { b: [ 4, 5 ] }
-    var s3 = { b: [ 6 ] }
+    var s1 = { a: [1, 2, 3] }
+    var s2 = { b: [4, 5] }
+    var s3 = { b: [6] }
     var res = M.extend(s1, s2, s3)
     assert.deepStrictEqual(res, {
-      a: [ 1, 2, 3 ],
-      b: [ 6 ]
+      a: [1, 2, 3],
+      b: [6]
     })
   })
   it('extending arrays of objects', function () {
-    var s1 = { a: [ { a: 1 }, { b: 2 }, 3 ] }
-    var s2 = { b: [ 3, { e: 4 }, { f: 5 } ] }
-    var s3 = { b: [ { g: 6 } ] }
+    var s1 = { a: [{ a: 1 }, { b: 2 }, 3] }
+    var s2 = { b: [3, { e: 4 }, { f: 5 }] }
+    var s3 = { b: [{ g: 6 }] }
     var res = M.extend(s1, s2, s3)
     assert.deepStrictEqual(res, {
-      a: [ { a: 1 }, { b: 2 }, 3 ],
-      b: [ { g: 6 } ]
+      a: [{ a: 1 }, { b: 2 }, 3],
+      b: [{ g: 6 }]
     })
   })
   it('assigning arrays of objects', function () {
-    var s1 = { a: [ { a: 1 }, { b: 2 }, 3 ] }
-    var s2 = { b: [ 3, { e: 4 }, { f: 5 } ] }
-    var s3 = { b: [ { g: 6 } ] }
+    var s1 = { a: [{ a: 1 }, { b: 2 }, 3] }
+    var s2 = { b: [3, { e: 4 }, { f: 5 }] }
+    var s3 = { b: [{ g: 6 }] }
     var res = M.assign(s1, s2, s3)
     assert.deepStrictEqual(res, {
-      a: [ { a: 1 }, { b: 2 }, 3 ],
-      b: [ { g: 6 } ]
+      a: [{ a: 1 }, { b: 2 }, 3],
+      b: [{ g: 6 }]
     })
   })
 })
@@ -281,28 +296,49 @@ describe('#merge', function () {
   })
 
   it('merging arrays', function () {
-    var s1 = { a: [ 1, 2, 3 ] }
-    var s2 = { b: [ 4, 5 ] }
-    var s3 = { b: [ 6 ] }
+    var s1 = { a: [1, 2, 3] }
+    var s2 = { b: [4, 5] }
+    var s3 = { b: [6] }
     var res = M.merge(s1, s2, s3)
-    var exp = { a: [ 1, 2, 3 ], b: [ 4, 5, 6 ] }
+    var exp = { a: [1, 2, 3], b: [4, 5, 6] }
     assert.deepStrictEqual(res, exp)
   })
 
   it('merging arrays of objects', function () {
-    var s1 = { a: [ { a: 1 }, { b: 2 }, 3 ] }
-    var s2 = { b: [ 3, { e: 4 }, { f: 5 } ] }
-    var s3 = { a: [ 4, { g: 5 }, 6 ], b: [ { g: 6 } ] }
-    var exp = { a: [{ a: 1 }, { b: 2 }, 3, 4, { g: 5 }, 6], b: [3, { e: 4 }, { f: 5 }, { g: 6 }] }
+    var s1 = { a: [{ a: 1 }, { b: 2 }, 3] }
+    var s2 = { b: [3, { e: 4 }, { f: 5 }] }
+    var s3 = { a: [4, { g: 5 }, 6], b: [{ g: 6 }] }
+    var exp = {
+      a: [{ a: 1 }, { b: 2 }, 3, 4, { g: 5 }, 6],
+      b: [3, { e: 4 }, { f: 5 }, { g: 6 }]
+    }
     var res = M.merge(s1, s2, s3)
     assert.deepStrictEqual(res, exp)
   })
 
   it('merging arrays of objects of objects', function () {
-    var s1 = { a: [{ aa: { ab: { ac: 1 } } }, { ba: { bb: 2 } }, 3], b: [{ a: 1 }] }
-    var s2 = { a: [{ aa: { ab: { ac: 2 } } }, { ba: { bb: 3 } }, 4], b: [{ a: 1 }] }
+    var s1 = {
+      a: [{ aa: { ab: { ac: 1 } } }, { ba: { bb: 2 } }, 3],
+      b: [{ a: 1 }]
+    }
+    var s2 = {
+      a: [{ aa: { ab: { ac: 2 } } }, { ba: { bb: 3 } }, 4],
+      b: [{ a: 1 }]
+    }
     var s3 = { a: [4, { g: 5 }, 6], b: [{ a: 1 }, { g: 6 }, { a: 2 }] }
-    var exp = { a: [{ aa: { ab: { ac: 1 } } }, { ba: { bb: 2 } }, 3, { aa: { ab: { ac: 2 } } }, { ba: { bb: 3 } }, 4, { g: 5 }, 6], b: [{ a: 1 }, { g: 6 }, { a: 2 }] }
+    var exp = {
+      a: [
+        { aa: { ab: { ac: 1 } } },
+        { ba: { bb: 2 } },
+        3,
+        { aa: { ab: { ac: 2 } } },
+        { ba: { bb: 3 } },
+        4,
+        { g: 5 },
+        6
+      ],
+      b: [{ a: 1 }, { g: 6 }, { a: 2 }]
+    }
     var res = M.merge(s1, s2, s3)
     assert.deepStrictEqual(res, exp)
   })
@@ -336,10 +372,26 @@ describe('#merge', function () {
   })
 
   it('should be save against prototype pollution', function () {
-    var payload = '{"__proto__":{"oops":"It works !"}}'
+    assert.equal(JSON.stringify({}.__proto__), '{}')
     var a = {}
-    M.merge({}, JSON.parse(payload))
+    M.merge({}, JSON.parse('{"__proto__":{"oops":"It works !"}}'))
     assert.strictEqual(a.oops, undefined)
+    assert.equal(JSON.stringify({}.__proto__), '{}')
+  })
+
+  it('should be save against prototype pollution using constructor', function () {
+    assert.equal(JSON.stringify({}.__proto__), '{}')
+    var someObj = {}
+    try {
+      M.merge(
+        true,
+        someObj,
+        JSON.parse('{"constructor":{"prototype":{"pollutedKey":123}}}')
+      )
+    } catch (_err) {
+      // noop
+    }
+    assert.equal(JSON.stringify({}.__proto__), '{}')
   })
 })
 
@@ -404,7 +456,7 @@ describe('#clone', function () {
     assert.ok(r.a.b.c !== o.a.b.c)
   })
   it('deep clone array', function () {
-    var o = [ { a: { b: 1 } }, { b: 2 }, { c: 3 } ]
+    var o = [{ a: { b: 1 } }, { b: 2 }, { c: 3 }]
     var r = M.clone(o)
     assert.deepStrictEqual(r, o)
     assert.ok(r !== o)
@@ -462,8 +514,8 @@ describe('#deepEqual', function () {
     assert.ok(M.deepEqual(a, b))
   })
   it('deep compare mixed objects', function () {
-    var a = { a: { b: { c: [ 1, 1, 2, 3 ] }, d: 2, e: null } }
-    var b = { a: { b: { c: [ 1, 1, 2, 3 ] }, d: 2, e: undefined } }
+    var a = { a: { b: { c: [1, 1, 2, 3] }, d: 2, e: null } }
+    var b = { a: { b: { c: [1, 1, 2, 3] }, d: 2, e: undefined } }
     assert.ok(M.deepEqual(a, b))
   })
   it('deep compare prototype objects', function () {
@@ -619,7 +671,7 @@ describe('#get', function () {
 describe('#set', function () {
   it('set properties', function () {
     var res = M.set({}, 'a."b.0".c["d.e.f"]', 1)
-    var exp = { 'a': { 'b.0': { 'c': { 'd.e.f': 1 } } } }
+    var exp = { a: { 'b.0': { c: { 'd.e.f': 1 } } } }
     assert.deepStrictEqual(res, exp)
   })
   it('delete a property', function () {

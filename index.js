@@ -59,7 +59,10 @@ function _checkCircular (opts, obj) {
     }
     opts._visited.push(obj)
     for (key in obj) {
-      if (obj.hasOwnProperty(key) && _checkCircular(opts, obj[key])) {
+      if (
+        Object.prototype.hasOwnProperty.call(obj, key) &&
+        _checkCircular(opts, obj[key])
+      ) {
         return true
       }
     }
@@ -92,7 +95,7 @@ function extend (target) {
     source = arguments[i]
     if (typeof source === 'object' && source) {
       for (key in source) {
-        if (source.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
           target[key] = source[key]
         }
       }
@@ -144,7 +147,7 @@ exports.merge = merge
  *
  * @param {Object} opts - options
  * @param {Boolean} opts.ignoreNull - treat `source === null` as undefined - target does not get deleted
- * @param {Boolean} opts.ignoreCircular - ignore cirular structures - no error gets thrown
+ * @param {Boolean} opts.ignoreCircular - ignore circular structures - no error gets thrown
  * @param {Object|Function|Array} target - target object
  * @param {Any} source - arguments 3 ... n
  * @return {Object} merged target
@@ -278,7 +281,7 @@ function _merge (opts, target, source) {
   if (!~opts._visited.indexOf(source)) {
     opts._visited.push(source)
     for (key in source) {
-      if (source.hasOwnProperty(key) && key !== '__proto__') {
+      if (Object.prototype.hasOwnProperty.call(source, key) && key !== '__proto__' && key !== 'constructor') {
         target[key] = _merge(opts, target[key], source[key])
       }
     }
@@ -511,7 +514,7 @@ function get (obj, keys, _default) {
 
   for (i = 0; i < keys.length; i++) {
     key = keys[i]
-    if (tmp && tmp.hasOwnProperty(key)) {
+    if (tmp && Object.prototype.hasOwnProperty.call(tmp, key)) {
       tmp = tmp[key]
     } else {
       return _default
@@ -566,7 +569,7 @@ function set (obj, keys, value) {
     if (!tmp[key]) {
       tmp[key] = {}
     }
-    if (tmp.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(tmp, key)) {
       tmp = tmp[key]
     }
   }
