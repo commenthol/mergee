@@ -21,37 +21,47 @@
   "maintainers": [
     "commenthol <commenthol@gmail.com>"
   ],
-  "main": "index.js",
-  "directories": {
-    "doc": "doc",
-    "test": "test"
-  },
-  "scripts": {
-    "all": "npm run lint && npm t",
-    "clean": "rm -rf doc coverage",
-    "cover": "istanbul cover _mocha --report lcov --report text -- -R dot --check-leaks test/*.mocha.js",
-    "doc": "mkdir -p doc && jsdox -o doc index.js",
-    "lint": "eslint '*.js' '**/*.js'",
-    "prepublishOnly": "npm run all",
-    "test": "mocha test/*.mocha.js"
-  },
-  "eslintConfig": {
-    "plugins": [
-      "standard"
-    ],
-    "extends": "standard",
-    "rules": {
-      "no-var": "off"
+  "sideEffects": "false",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "merge": {
+      "types": "./types/merge.d.ts",
+      "import": "./dist/merge.js",
+      "require": "./dist/merge.cjs"
     }
   },
+  "scripts": {
+    "all": "npm-run-all clean lint build c8 types",
+    "clean": "rimraf dist types coverage",
+    "build": "rollup -c rollup.config.js",
+    "c8": "c8 -r text -r html -r lcov npm test",
+    "lint": "eslint",
+    "test": "mocha",
+    "types": "tsc"
+  },
   "devDependencies": {
-    "eslint": "^8.57.1",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-standard": "^5.0.0",
-    "mocha": "~6.2.2"
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^20.14.11",
+    "c8": "^10.1.2",
+    "eslint": "^9.7.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.8.0",
+    "mocha": "^10.7.0",
+    "npm-run-all2": "^6.2.2",
+    "prettier": "^3.5.0",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.19.0",
+    "typescript": "^5.5.3"
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=18.0.0"
   }
 }

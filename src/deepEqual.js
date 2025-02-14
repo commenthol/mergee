@@ -1,6 +1,5 @@
-/* eslint eqeqeq:0 one-var:0 */
 /**
- * @module deepequal.js
+ * @module deepEqual.js
  * @see https://github.com/joyent/node/blob/v0.12.0-release/lib/assert.js
  */
 
@@ -28,18 +27,16 @@
 // ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-'use strict'
-
 // can't use standard util here as required functions are missing in node < 0.11
-var util = require('./util')
+import * as util from './util.js'
 
 /**
  * deep comparison of `actual` and `expected`
- * @param {Any} actual
- * @param {Any} expected
- * @return {Boolean} true if `actual` equals `expected`
+ * @param {any} actual
+ * @param {any} expected
+ * @return {boolean} true if `actual` equals `expected`
  */
-function deepEqual (actual, expected) {
+export function deepEqual(actual, expected) {
   // 7.1. All identical values are equivalent, as determined by ===.
   if (actual === expected) {
     return true
@@ -52,49 +49,56 @@ function deepEqual (actual, expected) {
 
     return true
 
-  // 7.2. If the expected value is a Date object, the actual value is
-  // equivalent if it is also a Date object that refers to the same time.
+    // 7.2. If the expected value is a Date object, the actual value is
+    // equivalent if it is also a Date object that refers to the same time.
   } else if (util.isDate(actual) && util.isDate(expected)) {
     return actual.getTime() === expected.getTime()
 
-  // 7.3 If the expected value is a RegExp object, the actual value is
-  // equivalent if it is also a RegExp object with the same source and
-  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
+    // 7.3 If the expected value is a RegExp object, the actual value is
+    // equivalent if it is also a RegExp object with the same source and
+    // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
   } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
-    return actual.source === expected.source &&
-           actual.global === expected.global &&
-           actual.multiline === expected.multiline &&
-           actual.lastIndex === expected.lastIndex &&
-           actual.ignoreCase === expected.ignoreCase
+    return (
+      actual.source === expected.source &&
+      actual.global === expected.global &&
+      actual.multiline === expected.multiline &&
+      actual.lastIndex === expected.lastIndex &&
+      actual.ignoreCase === expected.ignoreCase
+    )
 
-  // 7.4. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
+    // 7.4. Other pairs that do not both pass typeof value == 'object',
+    // equivalence is determined by ==.
   } else if (!util.isObject(actual) && !util.isObject(expected)) {
     return actual == expected
 
-  // 7.5 For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
+    // 7.5 For all other Object pairs, including Array objects, equivalence is
+    // determined by having the same number of owned properties (as verified
+    // with Object.prototype.hasOwnProperty.call), the same set of keys
+    // (although not necessarily the same order), equivalent values for every
+    // corresponding key, and an identical 'prototype' property. Note: this
+    // accounts for both named and indexed properties on Arrays.
   } else {
     return _objEquiv(actual, expected)
   }
 }
-module.exports = deepEqual
 
-function isArguments (object) {
+/**
+ * @param {any} object
+ * @returns {boolean}
+ */
+function isArguments(object) {
   return Object.prototype.toString.call(object) == '[object Arguments]'
 }
 
 /**
  * @see https://github.com/joyent/node/blob/v0.12.0-release/lib/assert.js
  */
-function _objEquiv (a, b) {
+function _objEquiv(a, b) {
   var ka, kb, key, i
 
-  if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b)) { return false }
+  if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b)) {
+    return false
+  }
 
   // an identical 'prototype' property.
   if (a.prototype !== b.prototype) return false
@@ -113,7 +117,8 @@ function _objEquiv (a, b) {
   try {
     ka = Object.keys(a)
     kb = Object.keys(b)
-  } catch (e) { // happens when one is a string literal and the other isn't
+  } catch (_err) {
+    // happens when one is a string literal and the other isn't
     return false
   }
   // having the same number of owned properties (keys incorporates
