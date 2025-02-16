@@ -1,5 +1,6 @@
 [![npm badge][npm-badge]][npm]
 ![types badge][types-badge]
+[![CI badge][ci-badge]][ci]
 
 # mergee
 
@@ -289,3 +290,5 @@ See [LICENSE][] for more info.
 [npm-badge]: https://badgen.net/npm/v/mergee
 [npm]: https://www.npmjs.com/package/mergee
 [types-badge]: https://badgen.net/npm/types/mergee
+[ci-badge]: https://github.com/commenthol/mergee/actions/workflows/ci.yml/badge.svg
+[ci]: https://github.com/commenthol/mergee/actions/workflows/ci.yml
