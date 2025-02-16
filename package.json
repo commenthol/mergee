@@ -1,11 +1,11 @@
 {
   "name": "mergee",
-  "version": "1.0.1",
+  "version": "2.0.0-2",
   "description": "Utilities for objects",
   "keywords": [
     "clone",
-    "extend",
     "merge",
+    "deepmerge",
     "object"
   ],
   "homepage": "https://github.com/commenthol/mergee",
@@ -21,37 +21,40 @@
   "maintainers": [
     "commenthol <commenthol@gmail.com>"
   ],
-  "main": "index.js",
-  "directories": {
-    "doc": "doc",
-    "test": "test"
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    "types": "./types/index.d.ts",
+    "default": "./src/index.js"
   },
+  "files": [
+    "src",
+    "types"
+  ],
   "scripts": {
-    "all": "npm run lint && npm t",
-    "clean": "rm -rf doc coverage",
-    "cover": "istanbul cover _mocha --report lcov --report text -- -R dot --check-leaks test/*.mocha.js",
-    "doc": "mkdir -p doc && jsdox -o doc index.js",
-    "lint": "eslint '*.js' '**/*.js'",
-    "prepublishOnly": "npm run all",
-    "test": "mocha test/*.mocha.js"
-  },
-  "eslintConfig": {
-    "plugins": [
-      "standard"
-    ],
-    "extends": "standard",
-    "rules": {
-      "no-var": "off"
-    }
+    "all": "npm-run-all clean lint c8 types",
+    "ci": "npm-run-all lint c8 types",
+    "clean": "rimraf types coverage",
+    "c8": "c8 -r text -r html -r lcov npm test",
+    "lint": "eslint",
+    "test": "mocha",
+    "types": "tsc"
   },
   "devDependencies": {
-    "eslint": "^8.57.1",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-standard": "^5.0.0",
-    "mocha": "~6.2.2"
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^22.13.4",
+    "c8": "^10.1.3",
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^15.15.0",
+    "mocha": "^11.1.0",
+    "npm-run-all2": "^7.0.2",
+    "prettier": "^3.5.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3"
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=22.0.0"
   }
 }

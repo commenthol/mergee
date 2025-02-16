@@ -1,7 +1,9 @@
-node_modules
-/coverage
-/doc
-/tmp
+node_modules/
+coverage/
+tmp/
 *.log
 *.tgz
-*.zip
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+.DS_Store
