@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { merge, mergeExt } from '../src/index.js'
+import { merge, mergeExt, arrayMergeDeep } from '../src/index.js'
 
 describe('merge', function () {
   it('merge nothing', function () {
@@ -148,7 +148,31 @@ describe('merge', function () {
     assert.deepStrictEqual(res, exp)
   })
 
-  it('merging arrays of objects of objects', function () {
+  it('default merging arrays of objects of objects', function () {
+    const s1 = {
+      a: [{ aa: { ab: { ac: 1 } } }, { ba: { bb: 2 } }, 3],
+      b: [{ a: 1 }]
+    }
+    const s2 = {
+      a: [{ aa: { ab: { ac: 2 } } }, { ba: { bb: 3 } }, 4],
+      b: [{ a: 1 }]
+    }
+    const exp = {
+      a: [
+        { aa: { ab: { ac: 1 } } },
+        { ba: { bb: 2 } },
+        3,
+        { aa: { ab: { ac: 2 } } },
+        { ba: { bb: 3 } },
+        4
+      ],
+      b: [{ a: 1 }, { a: 1 }]
+    }
+    const res = merge(s1, s2)
+    assert.deepStrictEqual(res, exp)
+  })
+
+  it('deep merging arrays of objects of objects', function () {
     const s1 = {
       a: [{ aa: { ab: { ac: 1 } } }, { ba: { bb: 2 } }, 3],
       b: [{ a: 1 }]
@@ -171,7 +195,7 @@ describe('merge', function () {
       ],
       b: [{ a: 1 }, { g: 6 }, { a: 2 }]
     }
-    const res = merge(s1, s2, s3)
+    const res = mergeExt({ arrayMerge: arrayMergeDeep }, s1, s2, s3)
     assert.deepStrictEqual(res, exp)
   })
 

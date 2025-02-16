@@ -16,4 +16,5 @@ import { isArray } from './util.js'
  * @param {object|any[]} source object to get cloned
  * @return {object|any[]} deep cloned object
  */
-export const clone = (source) => _merge({}, isArray(source) ? [] : {}, source)
+export const clone = (source) =>
+  _merge({ _visited: [] }, isArray(source) ? [] : {}, source)

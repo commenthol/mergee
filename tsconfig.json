@@ -7,7 +7,7 @@
     "declarationDir": "types",
     "emitDeclarationOnly": true,
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    // "moduleResolution": "NodeNext",
     "noEmitOnError": false,
     "noImplicitAny": false,
     "skipLibCheck": true,

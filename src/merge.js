@@ -1,5 +1,5 @@
 import * as util from './util.js'
-import { deepEqual } from './deepEqual.js'
+import { clone } from './clone.js'
 
 /**
  * merge multiple objects into `target`
@@ -18,9 +18,7 @@ import { deepEqual } from './deepEqual.js'
  * @param {any[]} source - arguments 2 ... n
  * @return {object} merged target
  */
-export function merge(target, ...source) {
-  return mergeExt({}, target, ...source)
-}
+export const merge = (target, ...source) => mergeExt({}, target, ...source)
 
 /**
  * extended merge
@@ -34,42 +32,45 @@ export function merge(target, ...source) {
  * mergeExt({ ignoreNull: true }, target, source1, source2)
  * //> target === { t: { s1: /source1/, s2: Wed Dec 31 1969 17:00:00 GMT-0700 (MST) }, x: { y: 'z' } }
  * ````
- *
- * @param {object} options options
- * @param {boolean} [options.ignoreNull] treat `source === null` as undefined - target does not get deleted
- * @param {boolean} [options.ignoreCircular] ignore circular structures - no error gets thrown
+ * @param {MergeExtOptions} options options
  * @param {object|function|array} target target object
  * @param {any[]} source arguments 3 ... n
  * @return {object} merged target
  */
 export function mergeExt(options, target, ...source) {
-  const opts = { ...options, _visited: [], _count: 0 }
+  const opts = { ...options, _visited: [] }
   return source.reduce((acc, curr) => _merge(opts, acc, curr), target)
 }
+
+/**
+ * @typedef {object} MergeExtOptions
+ * @property {boolean} [ignoreNull] treat `source === null` as undefined - target does not get deleted
+ * @property {boolean} [ignoreCircular] ignore circular structures - no error gets thrown
+ * @property {function} [arrayMerge] array merge function
+ */
+/**
+ * @typedef {object} MergeIntOptionsI
+ * @property {any[]} _visited visited references
+ */
+/**
+ * @typedef {MergeExtOptions & MergeIntOptionsI} MergeIntOptions
+ */
 
 /**
  * recursive merge helper
  *
  * @private
- * @param {Object} opts
+ * @param {MergeIntOptions} opts
  * @param {any} target
  * @param {any} source
  * @return {any} source merged into target
  */
 export function _merge(opts, target, source) {
-  let i
-  let j
-  let tmp
-  let equal
   let key
-
-  if (!opts._visited) {
-    opts._visited = []
-  }
 
   if (
     target === source || // for primitives or null
-    undefined === source // target stays the same
+    source === undefined // target stays the same
   ) {
     return target
   }
@@ -115,7 +116,7 @@ export function _merge(opts, target, source) {
       if (util.isMap(target)) {
         for (key of source.keys()) {
           target = new Map(target)
-          target.set(key, merge(target.get(key), source.get(key)))
+          target.set(key, _merge(opts, target.get(key), source.get(key)))
         }
       } else {
         target = new Map(source)
@@ -143,21 +144,7 @@ export function _merge(opts, target, source) {
     }
     case 'Array': {
       if (util.isArray(target)) {
-        const test = [...target] // test for duplicates
-        for (i = 0; i < source.length; i++) {
-          tmp = source[i]
-          if (!~test.indexOf(tmp)) {
-            if (!util.isObject(tmp) || tmp === null) {
-              // primitive or function or null or undefined
-              target.push(tmp)
-            } else {
-              equal = false
-              j = test.length
-              while (j-- > 0 && !(equal = deepEqual(test[j], tmp)));
-              if (!equal) target.push(_merge(opts, null, tmp))
-            }
-          }
-        }
+        target = (opts.arrayMerge || defaultArrayMerge)(target, source, opts)
       } else {
         // if target is not array replace with source
         target = _merge(opts, [], source)
@@ -189,7 +176,23 @@ export function _merge(opts, target, source) {
   }
 }
 
+/**
+ * @private
+ * @param {any} target
+ * @param {string} key
+ * @returns {boolean}
+ */
 const propertyIsUnsafe = (target, key) =>
   key in target &&
   (!Object.hasOwnProperty.call(target, key) || // unsafe if they exist up the prototype chain,
     !Object.propertyIsEnumerable.call(target, key))
+
+/**
+ * @private
+ * @param {any} target
+ * @param {any} source
+ * @param {MergeExtOptions} _opts
+ * @returns {any}
+ */
+const defaultArrayMerge = (target, source, _opts) =>
+  target.concat(source).map((elem) => clone(elem))

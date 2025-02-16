@@ -5,7 +5,7 @@
 
 > Utilities for objects
 
-This is a selection of utilities for objects and contains:
+This is a selection of utilities for objects containing:
 
 - merge - merge multiple sources into a target object; merges Map() and Set()
 - mergeExt - same as merge but with options
@@ -42,7 +42,7 @@ This is a selection of utilities for objects and contains:
 
 Deep merge of multiple objects into `target`.  
 Merges [Map][] and [Set][].  
-Clones [ArrayBuffer][], [Date][],[Error][], [Function][],[RegExp][] and [TypedArray][].
+Clones [ArrayBuffer][], [Date][],[Error][], [Function][],[RegExp][] and [TypedArray][]s.
 
 [ArrayBuffer]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
 [Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
@@ -57,7 +57,7 @@ Clones [ArrayBuffer][], [Date][],[Error][], [Function][],[RegExp][] and [TypedAr
 
 ```js
 import { merge } from 'mergee'
-const  target = { t: 1, x: { y: 'z' } }
+const target = { t: 1, x: { y: 'z' } }
 const source1 = { t: { s1: /source1/ } }
 const source2 = { t: { s2: new Date(100), x: null } }
 
@@ -89,13 +89,26 @@ mergeExt({ ignoreNull: true }, target, source1, source2)
 //> target === { t: { s1: /source1/, s2: Wed Dec 31 1969 17:00:00 GMT-0700 (MST) }, x: { y: 'z' } }
 ```
 
+
 **Parameters**
 
-**opts**: `Object`, options
+**opts**: `object`, options
 
-**opts.ignoreNull**: `Boolean`, treat `source === null` as undefined - target does not get deleted
+**opts.ignoreNull**: `boolean`, treat `source === null` as undefined - target does not get deleted
 
-**opts.ignoreCircular**: `Boolean`, ignore cirular structures - no error gets thrown
+**opts.ignoreCircular**: `boolean`, ignore cirular structures - no error gets thrown
+
+**opts.arrayMerge**: `(target: any, source: any, opts) => any` - custom array merge function.
+
+If deep comparison for array merge operations is required:
+
+```js
+import { arrayMergeDeep as arrayMerge, mergeExt } from 'mergee'
+const target = { a: [{ b: 1 }, 2] }
+const source = { a: [3, { b: 1 }] }
+r = mergeExt({ arrayMerge }, target, source)
+//> r = { a: [{ b:1 }, 2, 3]}
+```
 
 **target**: `object | function | any[]`, target object
 
@@ -121,7 +134,7 @@ var cloned = clone(obj)
 
 **Parameters**
 
-**obj**: `object | any[]`,  to get cloned
+**obj**: `object | any[]`, to get cloned
 
 **Returns**: `object | any[]`, deep cloned object
 
@@ -230,7 +243,7 @@ check if an object `obj` contains circular structures
 #### Example
 
 ```js
-import { isCircular} from 'mergee'
+import { isCircular } from 'mergee'
 const obj = { a: {} }
 obj.a.c = { c: 1 }
 //> isCircular(obj) === true
