@@ -27,6 +27,7 @@
     "types": "./types/index.d.ts",
     "default": "./src/index.js"
   },
+  "types": "./types/index.d.ts",
   "files": [
     "src",
     "types"
