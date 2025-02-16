@@ -39,7 +39,8 @@
     "c8": "c8 -r text -r html -r lcov npm test",
     "lint": "eslint",
     "test": "mocha",
-    "types": "tsc"
+    "types": "tsc",
+    "fix:types": "git restore types/clone.d.ts types/isCircular.d.ts"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
