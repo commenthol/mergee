@@ -1,3 +1,8 @@
+# 2.0.1 (2025-02-16)
+
+- docs: fix isCircular type (#3219c9b)
+- chore: types detection (#7c5ce9d)
+
 # 2.0.0 (2025-02-16)
 
 - BREAKING: refactoring to ESM module (#1) (#2533ebc)
